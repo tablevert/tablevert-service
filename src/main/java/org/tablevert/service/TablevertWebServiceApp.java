@@ -1,3 +1,8 @@
+/*
+ * Copyright 2019 doc-hil
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 package org.tablevert.service;
 
 import org.springframework.boot.SpringApplication;
@@ -7,7 +12,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class TablevertWebServiceApp {
 
     public static void main(String[] args) {
-        System.out.println("Los geht's");
         SpringApplication.run(TablevertWebServiceApp.class, args);
     }
 
