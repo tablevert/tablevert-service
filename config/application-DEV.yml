@@ -1,0 +1,17 @@
+hhs:
+  trash: Hallo, du Schönling!
+
+tablevert:
+  databases:
+    - type: POSTGRESQL
+      name: HHSSecondTest
+      host: localhost
+      users:
+        - name: dummyreader
+          secret: test
+
+  databaseQueries:
+    - name: TestQuery
+      databaseName: HHSSecondTest
+      statement: SELECT * FROM mydummy;
+
