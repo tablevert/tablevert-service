@@ -11,9 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.tablevert.core.*;
 import org.tablevert.api.config.TablevertConfigProvider;
+import org.tablevert.core.config.DatabaseQuery;
+import org.tablevert.core.config.TablevertConfig;
 
 import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
 
 @Service
 class TablevertService {
@@ -27,19 +28,58 @@ class TablevertService {
         this.configProvider = configProvider;
     }
 
-    byte[] tablevertToXlsx() {
+    byte[] tablevertToXlsx(TablevertRequest tablevertRequest) throws InvalidRequestException, TablevertCoreException {
         try {
-            Tableverter tableverter = new DatabaseTableverter(configProvider.getDefaultConfig());
+            OutputFormat outputFormat = OutputFormat.XLSX;
+            TablevertConfig config = configProvider.getDefaultConfig();
+
+            validateRequest(tablevertRequest, config, outputFormat);
+
+            Tableverter tableverter = new DatabaseTableverter(config);
             Output output = tableverter.tablevert(new AppliedDatabaseQuery.Builder()
-                    .forDatabaseQuery("TestQuery")
+                    .forDatabaseQuery(tablevertRequest.getQueryName())
                     .withUser("dummyreader")
-                    .build(), OutputFormat.XLSX);
-            OutputStream outputStream = new ByteArrayOutputStream();
+                    .build(), outputFormat);
+
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             output.writeContent(outputStream);
-            return ((ByteArrayOutputStream) outputStream).toByteArray();
-        } catch (Exception e) {
+            return outputStream.toByteArray();
+
+        } catch (TablevertCoreException e) {
             LOG.error("Could not read XLSX byte array!", e);
-            return null;
+            throw e;
+        }
+    }
+
+    private void validateRequest(TablevertRequest tablevertRequest,
+                                 TablevertConfig tablevertConfig,
+                                 OutputFormat outputFormat) throws InvalidRequestException {
+        validateOutputFormat(tablevertRequest.getType(), outputFormat);
+        String errors = "";
+        DatabaseQuery databaseQuery = tablevertConfig.getDatabaseQuery(tablevertRequest.getQueryName());
+        if (databaseQuery == null) {
+            errors += "Tablevert configuration contains no query for name [" + tablevertRequest.getQueryName() + "]; ";
+        }
+        if (!errors.isEmpty()) {
+            throw new InvalidRequestException(errors);
+        }
+    }
+
+    private void validateOutputFormat(String requestType, OutputFormat outputFormat) throws InvalidRequestException {
+        if (requestType == null) {
+            requestType = "[null]";
+        }
+        boolean ok;
+        switch (requestType) {
+            case (TablevertRequest.TYPE_XLSX):
+                ok = OutputFormat.XLSX.equals(outputFormat);
+                break;
+            default:
+                ok = false;
+        }
+        if (!ok) {
+            throw new InvalidRequestException("Request type [" + requestType + "] does not match output type ["
+                    + outputFormat.name() + "]");
         }
     }
 

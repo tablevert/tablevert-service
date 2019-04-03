@@ -5,11 +5,11 @@
 
 package org.tablevert.api;
 
-public class MediaType {
+class MediaType {
 
-    public static final String APPLICATION_TV_V1_0_0 = "application/vnd.org.tablevert.api.v1.0.0";
-    public static final String APPLICATION_TV_XLSX_V1_0_0 = "application/vnd.org.tablevert.api.xlsx.v1.0.0";
+    static final String APPLICATION_TV_V1_0_0 = "application/vnd.org.tablevert.api.v1.0.0";
+    static final String APPLICATION_TV_XLSX_V1_0_0 = "application/vnd.org.tablevert.api.xlsx.v1.0.0";
 
-    public static final String APPLICATION_XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    static final String APPLICATION_OPENXML_SPREADSHEET = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
 }

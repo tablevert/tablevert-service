@@ -13,11 +13,18 @@ import org.tablevert.core.config.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Spring bean for the provisioning of {@link TablevertConfig} objects.
+ */
 @Component
 public class TablevertConfigProvider {
 
     private TablevertConfig defaultConfig;
 
+    /**
+     * Returns a new {@code TablevertConfigProvider} instance to be used by the tablevert API service.
+     * @param serviceConfig the (autowired) {@link TablevertServiceConfig} configuration.
+     */
     @Autowired
     public TablevertConfigProvider(TablevertServiceConfig serviceConfig) {
         if (serviceConfig != null && serviceConfig.getDatabases() != null && serviceConfig.getDatabases().size() > 0) {
@@ -25,8 +32,17 @@ public class TablevertConfigProvider {
         }
     }
 
+    /**
+     * Gets a deep clone of the default Tablevert configuration.
+     * @return the clone
+     */
+    public TablevertConfig getDefaultConfig() {
+        return defaultConfig.clone();
+    }
+
     private void initDefaultConfig(TablevertServiceConfig serviceConfig) {
         try {
+            // TODO: Include validation of serviceConfig!!!
             defaultConfig = new SimpleTablevertConfig.Builder()
                     .withDatabases(convertDatabases(serviceConfig.getDatabases()))
                     .withQueries(convertQueries(serviceConfig.getDatabaseQueries()))
@@ -80,8 +96,4 @@ public class TablevertConfigProvider {
         return targetQueries;
     }
 
-    public TablevertConfig getDefaultConfig() {
-        // TODO: Return clone instead of reference!
-        return defaultConfig;
-    }
 }

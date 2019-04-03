@@ -8,26 +8,43 @@ package org.tablevert.api;
 /**
  * A request for consuming Tablevert functionality.
  */
-public class TablevertRequest {
+class TablevertRequest {
 
-    public static final String TYPE_XLSX = "XLSX";
+    /**
+     * Output type for XLSX files.
+     */
+    static final String TYPE_XLSX = "XLSX";
 
     private String type;
     private String queryName;
 
-    public String getQueryName() {
+    /**
+     * Gets the name of the query to execute.
+     * @return the query name
+     */
+    String getQueryName() {
         return queryName;
     }
 
-    public void setQueryName(String queryName) {
+    /**
+     * Sets the name of the query to execute.
+     */
+    void setQueryName(String queryName) {
         this.queryName = queryName;
     }
 
-    public String getType() {
+    /**
+     * Gets the type of the query to execute.
+     * @return the query name
+     */
+    String getType() {
         return type;
     }
 
-    public void setType(String type) {
+    /**
+     * Sets the type of the query to execute.
+     */
+    void setType(String type) {
         this.type = type;
     }
 }
