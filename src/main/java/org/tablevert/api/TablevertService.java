@@ -22,10 +22,12 @@ class TablevertService {
     private static final Log LOG = LogFactory.getLog(TablevertService.class);
 
     private TablevertConfigProvider configProvider;
+    private TableverterFactory tableverterFactory;
 
     @Autowired
-    TablevertService(TablevertConfigProvider configProvider) {
+    TablevertService(TablevertConfigProvider configProvider, TableverterFactory tableverterFactory) {
         this.configProvider = configProvider;
+        this.tableverterFactory = tableverterFactory;
     }
 
     byte[] tablevertToXlsx(TablevertRequest tablevertRequest) throws InvalidRequestException, TablevertCoreException {
@@ -35,7 +37,8 @@ class TablevertService {
 
             validateRequest(tablevertRequest, config, outputFormat);
 
-            Tableverter tableverter = new DatabaseTableverter(config);
+            Tableverter tableverter = tableverterFactory.createDatabaseTableverterFor(config);
+            // TODO: Include user handling!!!
             Output output = tableverter.tablevert(new AppliedDatabaseQuery.Builder()
                     .forDatabaseQuery(tablevertRequest.getQueryName())
                     .withUser("dummyreader")
@@ -54,18 +57,38 @@ class TablevertService {
     private void validateRequest(TablevertRequest tablevertRequest,
                                  TablevertConfig tablevertConfig,
                                  OutputFormat outputFormat) throws InvalidRequestException {
-        validateOutputFormat(tablevertRequest.getType(), outputFormat);
         String errors = "";
-        DatabaseQuery databaseQuery = tablevertConfig.getDatabaseQuery(tablevertRequest.getQueryName());
-        if (databaseQuery == null) {
-            errors += "Tablevert configuration contains no query for name [" + tablevertRequest.getQueryName() + "]; ";
+
+        errors += detectParameterIsNullErrors(tablevertRequest, tablevertConfig, outputFormat);
+        if (!errors.isEmpty()) {
+            throw new InvalidRequestException(errors);
         }
+
+        errors += detectOutputFormatErrors(tablevertRequest.getType(), outputFormat);
+        errors += detectDatabaseQueryErrors(tablevertRequest.getQueryName(), tablevertConfig);
+
         if (!errors.isEmpty()) {
             throw new InvalidRequestException(errors);
         }
     }
 
-    private void validateOutputFormat(String requestType, OutputFormat outputFormat) throws InvalidRequestException {
+    private String detectParameterIsNullErrors(TablevertRequest tablevertRequest,
+                                               TablevertConfig tablevertConfig,
+                                               OutputFormat outputFormat) {
+        String errors = "";
+        if (tablevertRequest == null) {
+            errors += "Request is not specified; ";
+        }
+        if (tablevertConfig == null) {
+            errors += "Configuration is not specified; ";
+        }
+        if (outputFormat == null) {
+            errors += "Output format is not specified; ";
+        }
+        return errors;
+    }
+
+    private String detectOutputFormatErrors(String requestType, OutputFormat outputFormat) {
         if (requestType == null) {
             requestType = "[null]";
         }
@@ -78,9 +101,19 @@ class TablevertService {
                 ok = false;
         }
         if (!ok) {
-            throw new InvalidRequestException("Request type [" + requestType + "] does not match output type ["
-                    + outputFormat.name() + "]");
+            return "Request type [" + requestType + "] does not match output type ["
+                    + (outputFormat == null ? "null" : outputFormat.name()) + "]; ";
         }
+        return "";
+    }
+
+    private String detectDatabaseQueryErrors(String queryName,
+                                             TablevertConfig tablevertConfig) {
+        DatabaseQuery databaseQuery = tablevertConfig.getDatabaseQuery(queryName);
+        if (databaseQuery == null) {
+            return "Tablevert configuration contains no query for name [" + (queryName == null ? "null" : queryName) + "]; ";
+        }
+        return "";
     }
 
 }

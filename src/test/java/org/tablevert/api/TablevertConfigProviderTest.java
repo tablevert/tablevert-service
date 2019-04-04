@@ -6,12 +6,15 @@
 package org.tablevert.api;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.tablevert.api.config.TablevertConfigProvider;
 import org.tablevert.api.config.TablevertServiceConfig;
+import org.tablevert.core.BuilderFailedException;
 import org.tablevert.core.TableverterFactory;
+import org.tablevert.core.config.TablevertConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +24,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
-@SpringBootTest
-class TablevertServiceTest {
+class TablevertConfigProviderTest {
 
     private static final String TESTDB_NAME = "DummyDb";
     private static final String TESTDB_TYPE = "POSTGRESQL";
@@ -34,65 +36,25 @@ class TablevertServiceTest {
     private static final String TESTUSER_NAME = "TestUser";
     private static final String TESTUSER_SECRET = "TestSecret";
 
-    @MockBean
-    TableverterFactory tableverterFactory;
+    @Test
+    void succeedsForValidServiceConfig() {
+        TablevertServiceConfig serviceConfig = createTablevertServiceConfig();
 
-    @BeforeEach
-    void setUpMockBeans() {
-        given(tableverterFactory.createDatabaseTableverterFor(any())).willReturn(new MockTableverter());
+        TablevertConfigProvider tablevertConfigProvider = new TablevertConfigProvider(serviceConfig);
+
+        assertThat(tablevertConfigProvider.getDefaultConfig()).isNotNull();
     }
 
     @Test
-    void succeedsForValidXlsxRequest() throws Exception {
-        TablevertService tablevertService
-                = new TablevertService(new TablevertConfigProvider(createTablevertServiceConfig()), tableverterFactory);
-        TablevertRequest request = createTablevertRequest();
+    @Disabled("Implementation incomplete!")
+    void failsOnInvalidQueryName() {
+        TablevertServiceConfig serviceConfig = createTablevertServiceConfig();
+        serviceConfig.getDatabaseQueries().get(0).setName(TESTQUERY_NAME_INVALID);
 
-        byte[] byteOutput = tablevertService.tablevertToXlsx(request);
-
-        assertThat(byteOutput).isNotNull().isNotEmpty();
-    }
-
-    @Test
-    void failsForMissingServiceConfig() {
-        TablevertService tablevertService
-                = new TablevertService(new TablevertConfigProvider(null), tableverterFactory);
-        TablevertRequest request = createTablevertRequest();
-
-        assertThatThrownBy(() -> tablevertService.tablevertToXlsx(request))
-                .isInstanceOf(InvalidRequestException.class)
+        assertThatThrownBy(() -> new TablevertConfigProvider(serviceConfig))
+                .isInstanceOf(BuilderFailedException.class)
                 .hasMessageContaining("onfiguration is not specified");
-    }
 
-    @Test
-    void failsForMissingRequest() {
-        TablevertService tablevertService
-                = new TablevertService(new TablevertConfigProvider(createTablevertServiceConfig()), tableverterFactory);
-        TablevertRequest request = null;
-
-        assertThatThrownBy(() -> tablevertService.tablevertToXlsx(request))
-                .isInstanceOf(InvalidRequestException.class)
-                .hasMessageContaining("equest is not specified");
-    }
-
-    @Test
-    void failsForInvalidQueryName() {
-        TablevertService tablevertService
-                = new TablevertService(new TablevertConfigProvider(createTablevertServiceConfig()), tableverterFactory);
-        TablevertRequest request = createTablevertRequest();
-        request.setQueryName(TESTQUERY_NAME_INVALID);
-
-        assertThatThrownBy(() -> tablevertService.tablevertToXlsx(request))
-                .isInstanceOf(InvalidRequestException.class)
-                .hasMessageContaining("no query for name")
-                .hasMessageContaining(TESTQUERY_NAME_INVALID);
-    }
-
-    private TablevertRequest createTablevertRequest() {
-        TablevertRequest request = new TablevertRequest();
-        request.setType(TablevertRequest.TYPE_XLSX);
-        request.setQueryName(TESTQUERY_NAME_VALID);
-        return request;
     }
 
     private TablevertServiceConfig createTablevertServiceConfig() {

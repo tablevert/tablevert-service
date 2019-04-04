@@ -37,7 +37,7 @@ public class TablevertConfigProvider {
      * @return the clone
      */
     public TablevertConfig getDefaultConfig() {
-        return defaultConfig.clone();
+        return defaultConfig == null ? null : defaultConfig.clone();
     }
 
     private void initDefaultConfig(TablevertServiceConfig serviceConfig) {
