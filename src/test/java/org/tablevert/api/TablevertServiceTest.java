@@ -54,7 +54,7 @@ class TablevertServiceTest {
     }
 
     @Test
-    void failsForMissingServiceConfig() {
+    void failsForMissingServiceConfig() throws TablevertApiException {
         TablevertService tablevertService
                 = new TablevertService(new TablevertConfigProvider(null), tableverterFactory);
         TablevertRequest request = createTablevertRequest();
@@ -65,7 +65,7 @@ class TablevertServiceTest {
     }
 
     @Test
-    void failsForMissingRequest() {
+    void failsForMissingRequest() throws TablevertApiException {
         TablevertService tablevertService
                 = new TablevertService(new TablevertConfigProvider(createTablevertServiceConfig()), tableverterFactory);
         TablevertRequest request = null;
@@ -76,7 +76,7 @@ class TablevertServiceTest {
     }
 
     @Test
-    void failsForInvalidQueryName() {
+    void failsForInvalidQueryName() throws TablevertApiException {
         TablevertService tablevertService
                 = new TablevertService(new TablevertConfigProvider(createTablevertServiceConfig()), tableverterFactory);
         TablevertRequest request = createTablevertRequest();

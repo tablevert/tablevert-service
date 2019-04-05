@@ -5,16 +5,11 @@
 
 package org.tablevert.api;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.tablevert.api.config.ConfigProviderException;
 import org.tablevert.api.config.TablevertConfigProvider;
 import org.tablevert.api.config.TablevertServiceConfig;
 import org.tablevert.core.BuilderFailedException;
-import org.tablevert.core.TableverterFactory;
-import org.tablevert.core.config.TablevertConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,11 +17,11 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 
 class TablevertConfigProviderTest {
 
-    private static final String TESTDB_NAME = "DummyDb";
+    private static final String TESTDB_NAME_VALID = "DummyDb";
+    private static final String TESTDB_NAME_INVALID = "InvalidDb";
     private static final String TESTDB_TYPE = "POSTGRESQL";
 
     private static final String TESTQUERY_NAME_VALID = "TestQuery";
@@ -37,7 +32,7 @@ class TablevertConfigProviderTest {
     private static final String TESTUSER_SECRET = "TestSecret";
 
     @Test
-    void succeedsForValidServiceConfig() {
+    void succeedsForValidServiceConfig() throws TablevertApiException {
         TablevertServiceConfig serviceConfig = createTablevertServiceConfig();
 
         TablevertConfigProvider tablevertConfigProvider = new TablevertConfigProvider(serviceConfig);
@@ -46,14 +41,13 @@ class TablevertConfigProviderTest {
     }
 
     @Test
-    @Disabled("Implementation incomplete!")
     void failsOnInvalidQueryName() {
         TablevertServiceConfig serviceConfig = createTablevertServiceConfig();
-        serviceConfig.getDatabaseQueries().get(0).setName(TESTQUERY_NAME_INVALID);
+        serviceConfig.getDatabaseQueries().get(0).setDatabaseName(TESTDB_NAME_INVALID);
 
         assertThatThrownBy(() -> new TablevertConfigProvider(serviceConfig))
-                .isInstanceOf(BuilderFailedException.class)
-                .hasMessageContaining("onfiguration is not specified");
+                .isInstanceOf(ConfigProviderException.class)
+                .hasCauseExactlyInstanceOf(BuilderFailedException.class);
 
     }
 
@@ -62,7 +56,7 @@ class TablevertConfigProviderTest {
 
         TablevertServiceConfig.Database database = new TablevertServiceConfig.Database();
         database.setHost("localhost");
-        database.setName(TESTDB_NAME);
+        database.setName(TESTDB_NAME_VALID);
         database.setType(TESTDB_TYPE);
         TablevertServiceConfig.Database.User user = new TablevertServiceConfig.Database.User();
         user.setName(TESTUSER_NAME);
@@ -76,7 +70,7 @@ class TablevertConfigProviderTest {
 
         TablevertServiceConfig.DatabaseQuery query = new TablevertServiceConfig.DatabaseQuery();
         query.setName(TESTQUERY_NAME_VALID);
-        query.setDatabaseName(TESTDB_NAME);
+        query.setDatabaseName(TESTDB_NAME_VALID);
         query.setStatement(TESTQUERY_STATEMENT);
         List<TablevertServiceConfig.DatabaseQuery> queries = new ArrayList<>();
         queries.add(query);

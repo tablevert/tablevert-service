@@ -5,7 +5,7 @@
 
 package org.tablevert.api;
 
-public class InvalidRequestException extends Exception {
+public class InvalidRequestException extends TablevertApiException {
     public InvalidRequestException(String message) {
         super(message);
     }

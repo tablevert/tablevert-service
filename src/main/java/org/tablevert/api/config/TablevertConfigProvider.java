@@ -7,6 +7,7 @@ package org.tablevert.api.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.tablevert.api.TablevertApiException;
 import org.tablevert.core.BuilderFailedException;
 import org.tablevert.core.config.*;
 
@@ -26,7 +27,7 @@ public class TablevertConfigProvider {
      * @param serviceConfig the (autowired) {@link TablevertServiceConfig} configuration.
      */
     @Autowired
-    public TablevertConfigProvider(TablevertServiceConfig serviceConfig) {
+    public TablevertConfigProvider(TablevertServiceConfig serviceConfig) throws TablevertApiException {
         if (serviceConfig != null && serviceConfig.getDatabases() != null && serviceConfig.getDatabases().size() > 0) {
             initDefaultConfig(serviceConfig);
         }
@@ -40,7 +41,7 @@ public class TablevertConfigProvider {
         return defaultConfig == null ? null : defaultConfig.clone();
     }
 
-    private void initDefaultConfig(TablevertServiceConfig serviceConfig) {
+    private void initDefaultConfig(TablevertServiceConfig serviceConfig) throws TablevertApiException {
         try {
             // TODO: Include validation of serviceConfig!!!
             defaultConfig = new SimpleTablevertConfig.Builder()
@@ -48,7 +49,7 @@ public class TablevertConfigProvider {
                     .withQueries(convertQueries(serviceConfig.getDatabaseQueries()))
                     .build();
         } catch (BuilderFailedException e) {
-            throw new IllegalStateException("Could not build default Tablevert configuration", e);
+            throw new ConfigProviderException("Could not build default Tablevert configuration", e);
         }
     }
 
