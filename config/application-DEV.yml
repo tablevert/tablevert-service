@@ -13,5 +13,8 @@ tablevert:
   databaseQueries:
     - name: TestQuery
       databaseName: HHSSecondTest
-      statement: SELECT * FROM mydummy;
+      columns:
+        - name: id
+        - name: description
+      fromClause: mydummy
 

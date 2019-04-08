@@ -29,7 +29,8 @@ class TablevertServiceTest {
 
     private static final String TESTQUERY_NAME_VALID = "TestQuery";
     private static final String TESTQUERY_NAME_INVALID = "InvalidTestQuery";
-    private static final String TESTQUERY_STATEMENT = "SELECT * FROM dummytable;";
+    private static final String TESTQUERY_COLUMNNAME_A = "id";
+    private static final String TESTQUERY_FROMCLAUSE = "dummytable";
 
     private static final String TESTUSER_NAME = "TestUser";
     private static final String TESTUSER_SECRET = "TestSecret";
@@ -115,7 +116,12 @@ class TablevertServiceTest {
         TablevertServiceConfig.DatabaseQuery query = new TablevertServiceConfig.DatabaseQuery();
         query.setName(TESTQUERY_NAME_VALID);
         query.setDatabaseName(TESTDB_NAME);
-        query.setStatement(TESTQUERY_STATEMENT);
+        TablevertServiceConfig.DatabaseQuery.Column column = new TablevertServiceConfig.DatabaseQuery.Column();
+        column.setName(TESTQUERY_COLUMNNAME_A);
+        List<TablevertServiceConfig.DatabaseQuery.Column> columns = new ArrayList<>();
+        columns.add(column);
+        query.setColumns(columns);
+        query.setFromClause(TESTQUERY_FROMCLAUSE);
         List<TablevertServiceConfig.DatabaseQuery> queries = new ArrayList<>();
         queries.add(query);
         config.setDatabaseQueries(queries);

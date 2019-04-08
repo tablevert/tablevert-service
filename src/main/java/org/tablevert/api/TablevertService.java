@@ -38,10 +38,8 @@ class TablevertService {
             validateRequest(tablevertRequest, config, outputFormat);
 
             Tableverter tableverter = tableverterFactory.createDatabaseTableverterFor(config);
-            // TODO: Include user handling!!!
             Output output = tableverter.tablevert(new AppliedDatabaseQuery.Builder()
                     .forDatabaseQuery(tablevertRequest.getQueryName())
-                    .withUser("dummyreader")
                     .build(), outputFormat);
 
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

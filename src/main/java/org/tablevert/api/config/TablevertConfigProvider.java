@@ -24,6 +24,7 @@ public class TablevertConfigProvider {
 
     /**
      * Returns a new {@code TablevertConfigProvider} instance to be used by the tablevert API service.
+     *
      * @param serviceConfig the (autowired) {@link TablevertServiceConfig} configuration.
      */
     @Autowired
@@ -35,6 +36,7 @@ public class TablevertConfigProvider {
 
     /**
      * Gets a deep clone of the default Tablevert configuration.
+     *
      * @return the clone
      */
     public TablevertConfig getDefaultConfig() {
@@ -91,10 +93,24 @@ public class TablevertConfigProvider {
             targetQueries.add(new DatabaseQuery.Builder()
                     .withName(query.getName())
                     .accessingDatabase(query.getDatabaseName())
-                    .withStatement(query.getStatement())
+                    .selectingColumns(convertColumns(query.getColumns()))
+                    .selectingFrom(query.getFromClause())
+                    .applyingFilter(query.getFilter())
+                    .withSorting(query.getSorting())
                     .build());
         }
         return targetQueries;
+    }
+
+    private List<DatabaseQueryColumn> convertColumns(List<TablevertServiceConfig.DatabaseQuery.Column> sourceColumns) {
+        if (sourceColumns == null) {
+            return null;
+        }
+        List<DatabaseQueryColumn> targetColumns = new ArrayList<>();
+        for (TablevertServiceConfig.DatabaseQuery.Column column : sourceColumns) {
+            targetColumns.add(new DatabaseQueryColumn(column.getFormula(), column.getName()));
+        }
+        return targetColumns;
     }
 
 }

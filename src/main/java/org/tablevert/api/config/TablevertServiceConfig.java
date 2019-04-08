@@ -102,7 +102,10 @@ public class TablevertServiceConfig {
     public static class DatabaseQuery {
         private String name;
         private String databaseName;
-        private String statement;
+        private List<Column> columns;
+        private String fromClause;
+        private String filter;
+        private List<String> sorting;
 
         public String getName() {
             return name;
@@ -120,12 +123,57 @@ public class TablevertServiceConfig {
             this.databaseName = databaseName;
         }
 
-        public String getStatement() {
-            return statement;
+        public List<Column> getColumns() {
+            return columns;
         }
 
-        public void setStatement(String statement) {
-            this.statement = statement;
+        public void setColumns(List<Column> columns) {
+            this.columns = columns;
+        }
+
+        public List<String> getSorting() {
+            return sorting;
+        }
+
+        public void setSorting(List<String> sorting) {
+            this.sorting = sorting;
+        }
+
+        public String getFromClause() {
+            return fromClause;
+        }
+
+        public void setFromClause(String fromClause) {
+            this.fromClause = fromClause;
+        }
+
+        public String getFilter() {
+            return filter;
+        }
+
+        public void setFilter(String filter) {
+            this.filter = filter;
+        }
+
+        public static class Column {
+            private String name;
+            private String formula;
+
+            public String getName() {
+                return name;
+            }
+
+            public void setName(String name) {
+                this.name = name;
+            }
+
+            public String getFormula() {
+                return formula;
+            }
+
+            public void setFormula(String formula) {
+                this.formula = formula;
+            }
         }
     }
 
