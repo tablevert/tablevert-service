@@ -1,5 +1,5 @@
-hhs:
-  trash: Hallo, du Schönling!
+test:
+  csrf-disabled: true
 
 tablevert:
   databases:

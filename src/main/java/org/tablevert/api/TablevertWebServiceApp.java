@@ -10,6 +10,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.tablevert.core.TableverterFactory;
 
+import java.util.Hashtable;
+import java.util.Map;
+
 @SpringBootApplication
 public class TablevertWebServiceApp {
 
@@ -19,7 +22,15 @@ public class TablevertWebServiceApp {
     }
 
     public static void main(String[] args) {
-        SpringApplication.run(TablevertWebServiceApp.class, args);
+        SpringApplication app = new SpringApplication(TablevertWebServiceApp.class);
+        app.setDefaultProperties(prepareDefaultProperties());
+        app.run(args);
+    }
+
+    private static Map<String, Object> prepareDefaultProperties() {
+        Map<String, Object> properties = new Hashtable<>();
+        properties.put("test.csrf-disabled", false);
+        return properties;
     }
 
 }
