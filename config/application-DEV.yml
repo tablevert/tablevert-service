@@ -17,4 +17,7 @@ tablevert:
         - name: id
         - name: description
       fromClause: mydummy
+      filter: id < 3
+      sorting:
+        - -description
 
