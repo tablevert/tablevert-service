@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
-@SpringBootTest
+@SpringBootTest(properties = { "test.csrf-disabled=false" })
 class TablevertServiceTest {
 
     private static final String TESTDB_NAME = "DummyDb";
