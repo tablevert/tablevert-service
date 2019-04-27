@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 doc-hil
+ * Copyright 2019 conis Informationssysteme GmbH
  * SPDX-License-Identifier: Apache-2.0
  */
 
