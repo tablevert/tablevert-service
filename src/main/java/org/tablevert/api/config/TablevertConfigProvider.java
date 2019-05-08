@@ -47,7 +47,7 @@ public class TablevertConfigProvider {
         try {
             // TODO: Include validation of serviceConfig!!!
             defaultConfig = new SimpleTablevertConfig.Builder()
-                    .withDatabases(convertDatabases(serviceConfig.getDatabases()))
+                    .withDataSources(convertDatabases(serviceConfig.getDatabases()))
                     .withQueries(convertQueries(serviceConfig.getDatabaseQueries()))
                     .build();
         } catch (BuilderFailedException e) {
@@ -72,25 +72,25 @@ public class TablevertConfigProvider {
         return targetDatabases;
     }
 
-    private List<DatabaseUser> convertUsers(List<TablevertServiceConfig.Database.User> sourceUsers) {
+    private List<BackendUser> convertUsers(List<TablevertServiceConfig.Database.User> sourceUsers) {
         if (sourceUsers == null) {
             return null;
         }
-        List<DatabaseUser> targetUsers = new ArrayList<>();
+        List<BackendUser> targetUsers = new ArrayList<>();
         for (TablevertServiceConfig.Database.User user : sourceUsers) {
-            targetUsers.add(new DatabaseUser(user.getName(), user.getSecret()));
+            targetUsers.add(new BackendUser(user.getName(), user.getSecret()));
         }
         return targetUsers;
     }
 
-    private List<DatabaseQuery> convertQueries(List<TablevertServiceConfig.DatabaseQuery> sourceQueries)
+    private List<PredefinedQuery> convertQueries(List<TablevertServiceConfig.DatabaseQuery> sourceQueries)
             throws BuilderFailedException {
         if (sourceQueries == null) {
             return null;
         }
-        List<DatabaseQuery> targetQueries = new ArrayList<>();
+        List<PredefinedQuery> targetQueries = new ArrayList<>();
         for (TablevertServiceConfig.DatabaseQuery query : sourceQueries) {
-            targetQueries.add(new DatabaseQuery.Builder()
+            targetQueries.add(new PredefinedDatabaseQuery.Builder()
                     .withName(query.getName())
                     .accessingDatabase(query.getDatabaseName())
                     .selectingColumns(convertColumns(query.getColumns()))

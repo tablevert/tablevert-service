@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.tablevert.core.*;
 import org.tablevert.api.config.TablevertConfigProvider;
-import org.tablevert.core.config.DatabaseQuery;
+import org.tablevert.core.config.PredefinedQuery;
 import org.tablevert.core.config.TablevertConfig;
 
 import java.io.ByteArrayOutputStream;
@@ -63,7 +63,7 @@ class TablevertService {
         }
 
         errors += detectOutputFormatErrors(tablevertRequest.getType(), outputFormat);
-        errors += detectDatabaseQueryErrors(tablevertRequest.getQueryName(), tablevertConfig);
+        errors += detectPredefinedQueryErrors(tablevertRequest.getQueryName(), tablevertConfig);
 
         if (!errors.isEmpty()) {
             throw new InvalidRequestException(errors);
@@ -105,10 +105,10 @@ class TablevertService {
         return "";
     }
 
-    private String detectDatabaseQueryErrors(String queryName,
-                                             TablevertConfig tablevertConfig) {
-        DatabaseQuery databaseQuery = tablevertConfig.getDatabaseQuery(queryName);
-        if (databaseQuery == null) {
+    private String detectPredefinedQueryErrors(String queryName,
+                                               TablevertConfig tablevertConfig) {
+        PredefinedQuery query = tablevertConfig.getPredefinedQuery(queryName);
+        if (query == null) {
             return "Tablevert configuration contains no query for name [" + (queryName == null ? "null" : queryName) + "]; ";
         }
         return "";
