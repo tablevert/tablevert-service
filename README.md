@@ -1,8 +1,7 @@
-# tablevert-core
-WORK IN PROGRESS
+# tablevert-service
+tablevert-service is a Spring-based RESTful service application for providing [tablevert] functionality. 
 
-tablevert-service is GOING TO be a Spring-based RESTful service application for providing [tablevert] functionality.
+See the [project website] for more details.
 
-[tablevert]: https://github.com/tablevert 
-
-A more detailed description will follow.
+[Tablevert]: https://github.com/tablevert 
+[project website]: http://www.tablevert.org "tablevert.org"
