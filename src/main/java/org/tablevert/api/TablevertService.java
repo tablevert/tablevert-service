@@ -30,17 +30,20 @@ class TablevertService {
         this.tableverterFactory = tableverterFactory;
     }
 
+    byte[] tablevertToHtml(TablevertRequest tablevertRequest) throws InvalidRequestException, TablevertCoreException {
+        try {
+            Output output = processRequestForOutputFormat(tablevertRequest, OutputFormat.HTML);
+            return output.toString().getBytes();
+
+        } catch (TablevertCoreException e) {
+            LOG.error("Could not read HTML byte array!", e);
+            throw e;
+        }
+    }
+
     byte[] tablevertToXlsx(TablevertRequest tablevertRequest) throws InvalidRequestException, TablevertCoreException {
         try {
-            OutputFormat outputFormat = OutputFormat.XLSX;
-            TablevertConfig config = configProvider.getDefaultConfig();
-
-            validateRequest(tablevertRequest, config, outputFormat);
-
-            Tableverter tableverter = tableverterFactory.createDatabaseTableverterFor(config);
-            Output output = tableverter.tablevert(new AppliedDatabaseQuery.Builder()
-                    .forDatabaseQuery(tablevertRequest.getQueryName())
-                    .build(), outputFormat);
+            Output output = processRequestForOutputFormat(tablevertRequest, OutputFormat.XLSX);
 
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             output.writeContent(outputStream);
@@ -51,6 +54,24 @@ class TablevertService {
             throw e;
         }
     }
+
+    private Output processRequestForOutputFormat(TablevertRequest tablevertRequest, OutputFormat outputFormat)
+            throws InvalidRequestException, TablevertCoreException {
+        try {
+            TablevertConfig config = configProvider.getDefaultConfig();
+            validateRequest(tablevertRequest, config, outputFormat);
+
+            Tableverter tableverter = tableverterFactory.createDatabaseTableverterFor(config);
+            return tableverter.tablevert(new AppliedDatabaseQuery.Builder()
+                    .forDatabaseQuery(tablevertRequest.getQueryName())
+                    .build(), outputFormat);
+
+        } catch (TablevertCoreException e) {
+            LOG.error("Could not read output byte array!", e);
+            throw e;
+        }
+    }
+
 
     private void validateRequest(TablevertRequest tablevertRequest,
                                  TablevertConfig tablevertConfig,
@@ -94,6 +115,9 @@ class TablevertService {
         switch (requestType) {
             case (TablevertRequest.TYPE_XLSX):
                 ok = OutputFormat.XLSX.equals(outputFormat);
+                break;
+            case (TablevertRequest.TYPE_HTML):
+                ok = OutputFormat.HTML.equals(outputFormat);
                 break;
             default:
                 ok = false;

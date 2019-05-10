@@ -57,6 +57,21 @@ class TablevertController {
         }
     }
 
+    @RequestMapping(value = "/tvrequest", method = POST, produces = { MediaType.APPLICATION_TV_HTML_V1_0_0 })
+    ResponseEntity createHtmlFor(@RequestBody TablevertRequest tablevertRequest) {
+        try {
+            ByteArrayResource byteArrayResource = new ByteArrayResource(tablevertService.tablevertToHtml(tablevertRequest));
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_TYPE, org.springframework.http.MediaType.TEXT_HTML_VALUE)
+                    .contentLength(byteArrayResource.contentLength())
+                    .body(byteArrayResource);
+        } catch (InvalidRequestException e) {
+            return badRequestResponseFor(e);
+        } catch (Exception e) {
+            return errorResponseFor(e);
+        }
+    }
+
     @RequestMapping(value = "/tvrequest", method = POST)
     ResponseEntity failDueToUnsupportedMediaType(HttpServletRequest httpServletRequest, @RequestHeader HttpHeaders httpHeaders) {
         try {
@@ -80,7 +95,7 @@ class TablevertController {
     }
 
     private ResponseEntity errorResponseFor(Exception e) {
-        LOGGER.error("tablevertToXlsx failed", e);
+        LOGGER.error("tablevert failed", e);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .contentType(org.springframework.http.MediaType.TEXT_PLAIN)
                 .body(e.getMessage());

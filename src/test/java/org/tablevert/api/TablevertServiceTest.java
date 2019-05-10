@@ -47,9 +47,20 @@ class TablevertServiceTest {
     void succeedsForValidXlsxRequest() throws Exception {
         TablevertService tablevertService
                 = new TablevertService(new TablevertConfigProvider(createTablevertServiceConfig()), tableverterFactory);
-        TablevertRequest request = createTablevertRequest();
+        TablevertRequest request = createTablevertRequest(TablevertRequest.TYPE_XLSX);
 
         byte[] byteOutput = tablevertService.tablevertToXlsx(request);
+
+        assertThat(byteOutput).isNotNull().isNotEmpty();
+    }
+
+    @Test
+    void succeedsForValidHtmlRequest() throws Exception {
+        TablevertService tablevertService
+                = new TablevertService(new TablevertConfigProvider(createTablevertServiceConfig()), tableverterFactory);
+        TablevertRequest request = createTablevertRequest(TablevertRequest.TYPE_HTML);
+
+        byte[] byteOutput = tablevertService.tablevertToHtml(request);
 
         assertThat(byteOutput).isNotNull().isNotEmpty();
     }
@@ -58,7 +69,7 @@ class TablevertServiceTest {
     void failsForMissingServiceConfig() throws TablevertApiException {
         TablevertService tablevertService
                 = new TablevertService(new TablevertConfigProvider(null), tableverterFactory);
-        TablevertRequest request = createTablevertRequest();
+        TablevertRequest request = createTablevertRequest(TablevertRequest.TYPE_XLSX);
 
         assertThatThrownBy(() -> tablevertService.tablevertToXlsx(request))
                 .isInstanceOf(InvalidRequestException.class)
@@ -80,7 +91,7 @@ class TablevertServiceTest {
     void failsForInvalidQueryName() throws TablevertApiException {
         TablevertService tablevertService
                 = new TablevertService(new TablevertConfigProvider(createTablevertServiceConfig()), tableverterFactory);
-        TablevertRequest request = createTablevertRequest();
+        TablevertRequest request = createTablevertRequest(TablevertRequest.TYPE_XLSX);
         request.setQueryName(TESTQUERY_NAME_INVALID);
 
         assertThatThrownBy(() -> tablevertService.tablevertToXlsx(request))
@@ -89,9 +100,9 @@ class TablevertServiceTest {
                 .hasMessageContaining(TESTQUERY_NAME_INVALID);
     }
 
-    private TablevertRequest createTablevertRequest() {
+    private TablevertRequest createTablevertRequest(String requestType) {
         TablevertRequest request = new TablevertRequest();
-        request.setType(TablevertRequest.TYPE_XLSX);
+        request.setType(requestType);
         request.setQueryName(TESTQUERY_NAME_VALID);
         return request;
     }

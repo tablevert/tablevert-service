@@ -10,9 +10,7 @@ package org.tablevert.api;
  */
 class TablevertRequest {
 
-    /**
-     * Output type for XLSX files.
-     */
+    static final String TYPE_HTML = "HTML";
     static final String TYPE_XLSX = "XLSX";
 
     private String type;

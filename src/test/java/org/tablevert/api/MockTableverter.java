@@ -14,6 +14,8 @@ public class MockTableverter implements Tableverter {
 
     public Output tablevert(AppliedQuery appliedQuery, OutputFormat outputFormat) {
         switch (outputFormat) {
+            case HTML:
+                return new MockHtmlOutput();
             case XLSX:
                 return new MockXlsxOutput();
             default:
